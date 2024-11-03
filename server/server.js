@@ -9,7 +9,7 @@ import { JWT_SECRET } from './secret.js'
 import authGuard from './auth.guard.js'
 
 const app = express()
-app.use(cors({ credentials: true, origin: '*' }))
+app.use(cors({ credentials: true, origin: ['http://localhost:9000', 'http://localhost:9100'] }))
 app.use(express.json())
 app.use(cookieParser())
 app.use(authGuard)
