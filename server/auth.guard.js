@@ -8,7 +8,9 @@ export default (req, res, next) => {
             req.user = jwt.verify(token, JWT_SECRET)
         }
         next()
-    } catch {
-        res.sendStatus(403)
+    } catch (e) {
+        console.error(e)
+        res.clearCookie('jwt', { httpOnly: true })
+        next()
     }
 }

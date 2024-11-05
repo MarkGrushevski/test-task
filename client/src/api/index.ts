@@ -1,5 +1,5 @@
 import { Store } from 'src/api/types.ts'
-import axios from 'axios'
+import { AxiosInstance } from 'axios'
 
 export interface GetStoresRequest {
     name: string
@@ -9,10 +9,15 @@ export interface GetStoresRequest {
     onlyName?: boolean
 }
 
-export const mainAPI = {
-    getStores: async <T extends GetStoresRequest>(
-        params: T
-    ): Promise<(T['onlyName'] extends true ? string : Store)[]> => {
+export class MainAPI {
+    api: AxiosInstance
+
+    constructor(axiosInstance: AxiosInstance) {
+        if (!axiosInstance) throw new Error('AxiosInstance not defined')
+        this.api = axiosInstance
+    }
+
+    async getStores<T extends GetStoresRequest>(params: T): Promise<(T['onlyName'] extends true ? string : Store)[]> {
         const { name, city, lat, lon, onlyName } = params
 
         const url = new URL('http://localhost:8000/stores')
@@ -23,10 +28,11 @@ export const mainAPI = {
         if (lon) url.searchParams.append('lon', lon.toString())
         if (onlyName) url.searchParams.append('only', 'name')
 
-        return axios.get(url.toString(), { withCredentials: true }).then((res) => res.data)
-    },
-    login: async (username: string, password: string) => {
+        return this.api.get(url.toString()).then((res) => res.data)
+    }
+
+    async login(username: string, password: string) {
         const url = new URL('http://localhost:8000/admin/login')
-        return axios.post(url.toString(), { username, password }, { withCredentials: true }).then((res) => res.data)
+        return this.api.post(url.toString(), { username, password }).then((res) => res.data)
     }
 }

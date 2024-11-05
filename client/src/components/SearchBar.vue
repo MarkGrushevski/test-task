@@ -1,11 +1,14 @@
 <script lang="ts" setup>
-import { onMounted, useTemplateRef } from 'vue'
+import { inject, onMounted, useTemplateRef } from 'vue'
 import type { QSelect } from 'quasar'
 import { useSearchStore } from 'stores/useSearchStore.ts'
 import { useStoresFetch } from 'src/composables/useStoresFetch.ts'
+import { AxiosInstance } from 'axios'
 
 const searchStore = useSearchStore()
 const { storeNames, isFetching, fetchStores, fetchStoreNames } = useStoresFetch()
+
+const axios = inject<AxiosInstance>('axios')
 
 const selectRef = useTemplateRef<QSelect>('select')
 
@@ -15,7 +18,7 @@ function handleSearchInput(value: string) {
     searchStore.searchValue = value?.trim() ?? ''
 
     if (searchStore.searchValue?.length >= 3) {
-        fetchStoreNames()
+        fetchStoreNames(axios!)
     }
 }
 
@@ -44,10 +47,10 @@ onMounted(() => {
         type="search"
         use-input
         @update:model-value="searchStore.searchValue = $event"
-        @input-value="handleSearchInput"
+        @input-value="handleSearchInput($event)"
     >
         <template #append>
-            <q-btn flat label="Поиск" rounded text-color="green" @click="fetchStores()" />
+            <q-btn flat label="Поиск" rounded text-color="green" @click="fetchStores($axios)" />
         </template>
         <template #no-option="{ inputValue }">
             <q-item v-show="inputValue">

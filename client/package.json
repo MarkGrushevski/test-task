@@ -8,7 +8,8 @@
         "format": "prettier --write \"**/*.{js,ts,vue,css,html,md,json}\" --ignore-path .gitignore",
         "test": "echo \"No test specified\" && exit 0",
         "dev": "quasar dev -m ssr",
-        "build": "quasar build"
+        "build": "quasar build -m ssr",
+        "start": "cd dist/ssr && npm run start"
     },
     "dependencies": {
         "@quasar/extras": "^1.16.4",

@@ -9,7 +9,9 @@ import { JWT_SECRET } from './secret.js'
 import authGuard from './auth.guard.js'
 
 const app = express()
-app.use(cors({ credentials: true, origin: ['http://localhost:9000', 'http://localhost:9100'] }))
+app.use(
+    cors({ credentials: true, origin: ['http://localhost:9000', 'http://localhost:9100', 'http://localhost:3000'] })
+)
 app.use(express.json())
 app.use(cookieParser())
 app.use(authGuard)
@@ -60,14 +62,14 @@ app.get('/stores', async (req, res) => {
 
 app.post('/admin/login', async (req, res) => {
     const { username = '', password = '' } = req.body
-
+    console.log('cookies', req.cookies)
     const jwtUser = req.user
     if (jwtUser) {
         const user = await getUser(jwtUser.username)
         if (user) {
             return res.sendStatus(200)
         } else {
-            res.clearCookie('jwt')
+            res.clearCookie('jwt', { httpOnly: true })
             return res.sendStatus(401)
         }
     } else {
@@ -75,11 +77,16 @@ app.post('/admin/login', async (req, res) => {
         if (user?.password === password) {
             const token = jwt.sign({ sub: user.id, username }, JWT_SECRET)
 
-            res.cookie('jwt', token, { maxAge: 1000 * 60 * 60, httpOnly: true, secure: false })
+            res.cookie('jwt', token, {
+                maxAge: 1000 * 60 * 20,
+                expires: new Date(Date.now() + 1000 * 60 * 20),
+                httpOnly: true,
+                secure: false
+            })
 
             return res.send(true)
         } else {
-            res.clearCookie('jwt')
+            res.clearCookie('jwt', { httpOnly: true })
             return res.sendStatus(401)
         }
     }

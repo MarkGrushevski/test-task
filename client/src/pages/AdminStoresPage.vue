@@ -6,6 +6,13 @@ import SearchBar from 'components/SearchBar.vue'
 import AdminGuardLayout from 'layouts/AdminGuardLayout.vue'
 import { useAdminAuthStore } from 'stores/useAdminAuthStore.ts'
 
+defineOptions({
+    async preFetch({ store }) {
+        const authStore = useAdminAuthStore(store)
+        await authStore.handleLogin()
+    }
+})
+
 const authStore = useAdminAuthStore()
 const { stores } = useStoresFetch()
 </script>

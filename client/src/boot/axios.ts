@@ -1,31 +1,68 @@
 import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance } from 'axios'
+import { Cookies } from 'quasar'
+import { QSsrContext } from '@quasar/app-vite'
 
 declare module 'vue' {
     interface ComponentCustomProperties {
         $axios: AxiosInstance
-        $api: AxiosInstance
     }
 }
 
-// Be careful when using SSR for cross-request state pollution
-// due to creating a Singleton instance here;
-// If any client changes this (global) instance, it might be a
-// good idea to move this instance creation inside of the
-// "export default () => {}" function below (which runs individually
-// for each client)
-const api = axios.create({ baseURL: 'https://api.example.com' })
+declare module 'pinia' {
+    export interface PiniaCustomProperties {
+        $axios: AxiosInstance
+    }
+}
 
-export default boot(({ app }) => {
-    // for use inside Vue files (Options API) through this.$axios and this.$api
+export default boot(({ app, store, ssrContext }) => {
+    const api = axios.create({ baseURL: 'http://localhost:8000', withCredentials: true })
 
-    app.config.globalProperties.$axios = axios
-    // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
-    //       so you won't necessarily have to import axios in each vue file
+    const cookies = getCookies(ssrContext)
 
-    app.config.globalProperties.$api = api
-    // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
-    //       so you can easily perform requests against your app's API
+    api.interceptors.request.use(
+        (config) => {
+            const token = cookies.get('jwt')
+
+            console.group(process.env.SERVER ? 'Request server' : 'Request client')
+            console.log('cookies', cookies.getAll())
+            console.groupEnd()
+
+            if (token) {
+                config.headers.Cookie = 'jwt=' + token
+            }
+            return config
+        },
+        (error) => {
+            return Promise.reject(error)
+        }
+    )
+
+    api.interceptors.response.use(
+        (config) => {
+            // const cookies = getCookies(ssrContext)
+            const token = cookies.get('jwt')
+
+            console.group(process.env.SERVER ? 'Response server' : 'Response client')
+            console.log('cookies', cookies.getAll())
+            console.groupEnd()
+
+            if (token) {
+            }
+            return config
+        },
+        (error) => {
+            return Promise.reject(error)
+        }
+    )
+
+    app.provide('axios', api)
+
+    store.use(() => ({ $axios: api }))
+
+    app.config.globalProperties.$axios = api
 })
 
-export { api }
+function getCookies(ssrContext: QSsrContext | null | undefined) {
+    return process.env.SERVER ? Cookies.parseSSR(ssrContext) : Cookies
+}

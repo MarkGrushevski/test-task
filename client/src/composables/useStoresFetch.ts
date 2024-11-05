@@ -1,17 +1,20 @@
-import { mainAPI } from 'src/api'
 import { useSearchStore } from 'stores/useSearchStore.ts'
 import { useGeoPositionStore } from 'stores/useGeoPositionStore.ts'
 import { ref } from 'vue'
 import { Store } from 'src/api/types.ts'
+import { MainAPI } from 'src/api'
+import { AxiosInstance } from 'axios'
 
 const stores = ref<Store[]>([])
 const storeNames = ref<string[]>([])
 const isFetching = ref(false)
 
 export function useStoresFetch() {
-    async function fetchStoreNames() {
+    async function fetchStoreNames(api: AxiosInstance) {
         isFetching.value = true
         try {
+            const mainAPI = new MainAPI(api)
+
             storeNames.value = await mainAPI.getStores({
                 name: useSearchStore().searchValue,
                 ...useGeoPositionStore().currentPosition,
@@ -23,9 +26,11 @@ export function useStoresFetch() {
         isFetching.value = false
     }
 
-    async function fetchStores() {
+    async function fetchStores(api: AxiosInstance) {
         isFetching.value = true
         try {
+            const mainAPI = new MainAPI(api)
+
             stores.value = await mainAPI.getStores({
                 name: useSearchStore().searchValue,
                 ...useGeoPositionStore().currentPosition

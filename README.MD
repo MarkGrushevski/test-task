@@ -2,12 +2,12 @@
 
 ### Main deps
 
-* vue 3
-* pinia
-* vue-router
-* typescript
-* quasar
-* axios
+- vue 3
+- pinia
+- vue-router
+- typescript
+- quasar
+- axios
 
 ### Run dev
 
@@ -19,9 +19,9 @@ npm dev
 
 ### Main deps
 
-* express
-* jsonwebtoken
-* geolib
+- express
+- jsonwebtoken
+- geolib
 
 ### Run dev
 

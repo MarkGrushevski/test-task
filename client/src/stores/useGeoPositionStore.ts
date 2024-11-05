@@ -9,7 +9,6 @@ export const useGeoPositionStore = defineStore('geo-position', () => {
 
     function askUserPosition() {
         navigator.geolocation.getCurrentPosition((geoData) => {
-            console.log(geoData)
             currentPosition.value = {
                 lat: geoData.coords.latitude,
                 lon: geoData.coords.longitude

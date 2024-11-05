@@ -8,7 +8,7 @@ import { configure } from 'quasar/wrappers'
 export default configure((/* ctx */) => {
     return {
         // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
-        // preFetch: true,
+        preFetch: true,
 
         // app boot file (/src/boot)
         // --> boot files are part of "main.js"
@@ -82,12 +82,18 @@ export default configure((/* ctx */) => {
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
         framework: {
-            config: {},
+            config: {
+                loading: {
+                    backgroundColor: 'white',
+                    spinnerColor: 'green',
+                    spinnerSize: 48
+                }
+            },
 
             // iconSet: 'material-icons', // Quasar icon set
             // lang: 'en-US', // Quasar language pack
 
-            // For special cases outside of where the auto-import strategy can have an impact
+            // For special cases outside where the auto-import strategy can have an impact
             // (like functional components as one of the examples),
             // you can manually specify Quasar components/directives to be available everywhere:
             //
@@ -95,7 +101,7 @@ export default configure((/* ctx */) => {
             // directives: [],
 
             // Quasar plugins
-            plugins: []
+            plugins: ['Loading', 'Cookies']
         },
 
         // animations: 'all', // --- includes all animations
