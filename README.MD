@@ -1,4 +1,4 @@
-[Test task](./task.md)
+[Task](./task.md)
 
 ## Client
 
